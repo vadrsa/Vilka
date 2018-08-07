@@ -11,13 +11,16 @@ using LinqToDB.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using VilkaApi.ExceptionHandling;
 
 namespace VilkaApi
 {
@@ -33,15 +36,15 @@ namespace VilkaApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             DataConnection
-				.AddConfiguration(
+                .AddConfiguration(
 					"Default",
 					Configuration["ConnectionString"],
 					new SqlServerDataProvider("Default", SqlServerVersion.v2012));
 
 			DataConnection.DefaultConfiguration = "Default";
-
-			services.AddIdentity<User, LinqToDB.Identity.IdentityRole>()
+            services.AddIdentity<User, LinqToDB.Identity.IdentityRole>()
 				.AddLinqToDBStores(new DefaultConnectionFactory())
 				.AddDefaultTokenProviders();
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -71,6 +74,15 @@ namespace VilkaApi
 						DataProtectionProvider.Create(new DirectoryInfo("C:\\Github\\Identity\\artifacts"));
 
 				});
+
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+            services.AddRouting(options => options.LowercaseUrls = true);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSingleton<IConfiguration>(Configuration);
         }
@@ -78,13 +90,16 @@ namespace VilkaApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
             }
             else
             {
                 app.UseHsts();
+
             }
             var connectionString = new SqlConnectionStringBuilder(Configuration["ConnectionString"])
 			{
@@ -120,9 +135,11 @@ namespace VilkaApi
 
 			app.UseStaticFiles();
 
-
             app.UseHttpsRedirection();
+            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+
             app.UseAuthentication();
+
             app.UseMvc();
         }
 

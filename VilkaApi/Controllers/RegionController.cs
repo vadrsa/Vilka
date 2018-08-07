@@ -18,18 +18,13 @@ namespace VilkaApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         
-        private Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
-
-        public RegionController(UserManager<User> userManager){
+        public RegionController(UserManager<User> userManager)
+        {
             _userManager = userManager;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Region>>> Get()
-        {
-            return RegionRepository.Instance.SelectAll();
-        }
-
+        private Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
+        
         [Route("question")]
         [Authorize]
         public async Task<ActionResult<RegionQuestionInfo>> GetNextQuestion()
@@ -41,23 +36,13 @@ namespace VilkaApi.Controllers
         [Route("answer")]
         [HttpPost]
         [Authorize]
-        public async void Post([FromBody] RegionHistoryItem answer)
+        public async Task<bool> Post([FromBody] RegionHistoryItem answer)
         {
             User user = await GetCurrentUserAsync();
             answer.UserID = user.Id;
             new RegionQuestionManager().AnswerQuestion(answer);
+            return true;
         }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        
     }
 }

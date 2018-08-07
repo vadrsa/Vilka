@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http.Cors;
 using BusinessEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace WebApiJwt.Controllers
 {
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     public class AccountController : Controller
     {
         private readonly SignInManager<User> _signInManager;
@@ -40,10 +41,10 @@ namespace WebApiJwt.Controllers
             if (result.Succeeded)
             {
                 var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
-                return await GenerateJwtToken(model.Email, appUser);
+                return new UserClientDto { Email = appUser.Email, Username = appUser.UserName, Token = await GenerateJwtToken(model.Email, appUser) };
             }
-            
-            throw new ApplicationException("INVALID_LOGIN_ATTEMPT");
+
+            throw new Exception("Wrong credentials.");
         }
        
         [HttpPost]
@@ -59,7 +60,7 @@ namespace WebApiJwt.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, false);
-                return await GenerateJwtToken(model.Email, user);
+                return new UserClientDto { Email = user.Email, Username = user.UserName, Token = await GenerateJwtToken(model.Email, user) };
             }
             
             throw new ApplicationException("UNKNOWN_ERROR");
@@ -92,21 +93,28 @@ namespace WebApiJwt.Controllers
         public class LoginDto
         {
             [Required]
-            public string Email { get; set; }
+            public string Email { get; set; } = "";
 
             [Required]
-            public string Password { get; set; }
+            public string Password { get; set; } = "";
+            
+        }
 
+        public class UserClientDto
+        { 
+            public string Email { get; set; }
+            public string Username { get; set; }
+            public object Token { get; set; }
         }
         
         public class RegisterDto
         {
             [Required]
-            public string Email { get; set; }
+            public string Email { get; set; } = "";
 
             [Required]
             [StringLength(100, ErrorMessage = "PASSWORD_MIN_LENGTH", MinimumLength = 6)]
-            public string Password { get; set; }
+            public string Password { get; set; } = "";
         }
     }
 }
