@@ -1,0 +1,13 @@
+<div class="container">
+  <h1>Hi {{currentUser.username}}!</h1>
+    <div class=" container compareOptions">
+        <p>You have the following compare options:</p>
+        <div class="btn-group" role="group" aria-label="Basic example" >
+            <button (click)="compareRegions()" type="button" class="btn btn-secondary">Region</button>
+            <button type="button" class="btn btn-secondary">League</button>
+            <button type="button" class="btn btn-secondary">Team</button>
+            <button type="button" class="btn btn-secondary">Bet Type</button>
+        </div>
+    </div>
+  <p><a [routerLink]="['/login']">Logout</a></p>
+</div>

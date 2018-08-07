@@ -1,0 +1,22 @@
+<div class="navigation">
+  <a href="#" (click)="NavigateBack()">Go Back</a>
+</div>
+<div *ngIf='!loading'>
+
+  <div class="page-header">
+      <h2 class="questionHeading">Are these regions the same?</h2>
+  </div>
+    
+    <ul  class="list-group">
+      <li class="list-group-item">{{regionFirst}}</li>
+      <li class="list-group-item">{{regionSecond}}</li>
+    </ul>
+    <div class="YesNoButtons">
+        <button (click)="AnswerQuestion(1)" class="btn btn-primary">
+          Yes
+        </button>
+        <button (click)="AnswerQuestion(2)" class="btn btn-secondary">
+          No
+        </button>
+    </div>
+</div>
