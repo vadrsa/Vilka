@@ -1,7 +1,7 @@
 <div class="navigation">
   <a href="#" (click)="NavigateBack()">Go Back</a>
 </div>
-<div *ngIf='!loading'>
+<div >
 
   <div class="page-header">
       <h2 class="questionHeading">Are these regions the same?</h2>
@@ -12,10 +12,10 @@
       <li class="list-group-item">{{regionSecond}}</li>
     </ul>
     <div class="YesNoButtons">
-        <button (click)="AnswerQuestion(1)" class="btn btn-primary">
+        <button (click)="!loading && AnswerQuestion(1)" [className]="'btn btn-primary ' + (loading ? 'disabled' : 'enabled')">
           Yes
         </button>
-        <button (click)="AnswerQuestion(2)" class="btn btn-secondary">
+        <button (click)="!loading && AnswerQuestion(2)" [className]="'btn btn-secondary ' + (loading ? 'disabled' : 'enabled')">
           No
         </button>
     </div>

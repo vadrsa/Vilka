@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 import { Observable,Subject } from 'rxjs';
+import { HttpErrorResponse } from '../../../node_modules/@angular/common/http';
 
 @Injectable()
 export class AlertService {
@@ -30,6 +31,16 @@ export class AlertService {
     error(message: string, keepAfterNavigationChange = false) {
         console.log(message);
         this.keepAfterNavigationChange = keepAfterNavigationChange;
+        this.subject.next({ type: 'error', text: message });
+    }
+    
+    errorFromResponse(e: HttpErrorResponse, keepAfterNavigationChange = false) {
+        this.keepAfterNavigationChange = keepAfterNavigationChange;
+        var message = "Unknown error.";
+        if(e.status === 0)
+            message = "Failed to connect to the server.";
+        else if(e.error != null)
+            message = e.error.error;
         this.subject.next({ type: 'error', text: message });
     }
 

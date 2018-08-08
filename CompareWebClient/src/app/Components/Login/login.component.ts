@@ -41,8 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       .subscribe(
       (key) => { this.router.navigate([this.returnUrl]); },
       (error) => {
-        console.log(error);
-        this.alertService.error(error.error.error);
+        this.alertService.errorFromResponse(error);
         this.loading = false;
       }
     ));

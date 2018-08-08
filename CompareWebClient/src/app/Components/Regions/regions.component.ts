@@ -37,7 +37,8 @@ export class RegionsComponent implements OnInit, OnDestroy {
         }
       },
       (error) => {
-        this.alertService.error(error.error.error);
+        
+        this.alertService.errorFromResponse(error);
       }
 
     ));
@@ -45,6 +46,9 @@ export class RegionsComponent implements OnInit, OnDestroy {
   }
 
   GetNextQuestion(){
+    this.regionFirst = "Region";
+    this.regionSecond = "Region";
+    this.regionQuestionID = 0;
     this.loading = true;
     this.subscription.add(this.regionService.getNextQuestion().subscribe(
       (data) => {
@@ -52,16 +56,17 @@ export class RegionsComponent implements OnInit, OnDestroy {
           this.regionFirst = data.regionOne;
           this.regionSecond = data.regionTwo;
           this.regionQuestionID = data.regionQuestionID;
-          this.loading = false;
         }
         else{
           this.alertService.error("There are no questions for this criteria right now.");
-
         }
+        this.loading = false;
+
       },
       (error) => {
-        this.alertService.error(error.error.error);
-
+        
+        this.alertService.errorFromResponse(error);
+        this.loading = false;
       }
     ));
   }
