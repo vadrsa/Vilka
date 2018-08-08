@@ -32,7 +32,6 @@ export class RegionsComponent implements OnInit, OnDestroy {
     this.subscription.add(this.regionService.answerQuestion(this.regionQuestionID, answer)
     .subscribe(
       (data) => {
-        console.log(data);
         if(data){
           this.GetNextQuestion();
         }
