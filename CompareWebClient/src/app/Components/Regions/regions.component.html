@@ -7,9 +7,9 @@
       <h2 class="questionHeading">Are these regions the same?</h2>
   </div>
     
-    <ul  class="list-group">
-      <li class="list-group-item">{{regionFirst}}</li>
-      <li class="list-group-item">{{regionSecond}}</li>
+    <ul  class="list-group" >
+      <li [className]="'list-group-item ' + (loading ? 'disabled' : 'enabled')">{{regionFirst}}</li>
+      <li [className]="'list-group-item ' + (loading ? 'disabled' : 'enabled')">{{regionSecond}}</li>
     </ul>
     <div class="YesNoButtons">
         <button (click)="!loading && AnswerQuestion(1)" [className]="'btn btn-primary ' + (loading ? 'disabled' : 'enabled')">
