@@ -16,13 +16,13 @@ using Microsoft.IdentityModel.Tokens;
 namespace WebApiJwt.Controllers
 {
     [Route("api/[controller]/[action]")]
-    public class AccountController : Controller
+    public class AuthenticationController : Controller
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
 
-        public AccountController(
+        public AuthenticationController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IConfiguration configuration
@@ -31,6 +31,11 @@ namespace WebApiJwt.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration =     configuration;
+        }
+
+        public ActionResult<object> Connect()
+        {
+            return "Successfully connected!";
         }
         
         [HttpPost]

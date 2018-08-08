@@ -14,7 +14,9 @@ import { routing } from './app-routing.module';
 import { AlertComponent } from './Components/Alert/alert.component';
 import { HomeComponent } from './Components/home/home.component';
 import { RegionsComponent } from './Components/regions/regions.component';
-
+import { LoadingBarHttpClientModule } from '@ngx-loading-bar/http-client';
+import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
+import { LoadingBarModule } from '@ngx-loading-bar/core';
 
 @NgModule({
   declarations: [
@@ -27,6 +29,10 @@ import { RegionsComponent } from './Components/regions/regions.component';
   imports: [
     FormsModule,
     BrowserModule,
+    LoadingBarHttpClientModule,
+    LoadingBarRouterModule,
+    LoadingBarModule.forRoot(),
+    LoadingBarHttpClientModule,
     HttpClientModule,
     routing
   ],

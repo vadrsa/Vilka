@@ -3,28 +3,32 @@ import { RegionService } from '../../Services/region.service';
 import { Router } from '@angular/router';
 import {Location} from '@angular/common';
 import {AlertService} from '../../Services/alert.service'
+import { OnDestroy } from "@angular/core";
+import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-regions',
   templateUrl: './regions.component.html',
   styleUrls: ['./regions.component.css']
 })
-export class RegionsComponent implements OnInit {
+export class RegionsComponent implements OnInit, OnDestroy {
 
   constructor( private regionService: RegionService,
     private router: Router,
-    private _location: Location
+    private _location: Location,
     private alertService: AlertService
-  ) { }
+  ) {
+    this.subscription = new Subscription();
+   }
 
   regionFirst:string;
   regionSecond:string;
   regionQuestionID;
   loading:boolean = true;
-
+  subscription:Subscription;
   
   AnswerQuestion(answer){
-    console.log(answer);
-    this.regionService.answerQuestion(this.regionQuestionID, answer)
+    this.subscription.add(this.regionService.answerQuestion(this.regionQuestionID, answer)
     .subscribe(
       (data) => {
         console.log(data);
@@ -36,13 +40,13 @@ export class RegionsComponent implements OnInit {
         this.alertService.error(error.error.error);
       }
 
-    );
+    ));
     
   }
 
   GetNextQuestion(){
     this.loading = true;
-    this.regionService.getNextQuestion().subscribe(
+    this.subscription.add(this.regionService.getNextQuestion().subscribe(
       (data) => {
         if(data){
           this.regionFirst = data.regionOne;
@@ -59,7 +63,7 @@ export class RegionsComponent implements OnInit {
         this.alertService.error(error.error.error);
 
       }
-    );
+    ));
   }
 
   NavigateBack(){
@@ -69,6 +73,9 @@ export class RegionsComponent implements OnInit {
 
   ngOnInit() {
     this.GetNextQuestion();
+  }
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
   }
 
 }

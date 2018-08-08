@@ -18,6 +18,6 @@ export class RegionService {
   }
 
   answerQuestion(questionID, answer){
-    return this.http.post<bool>(Config.apiUrl + 'region/answer', { regionQuestionID: questionID, answer: answer});
+    return this.http.post<boolean>(Config.apiUrl + 'region/answer', { regionQuestionID: questionID, answer: answer});
   }
 }
