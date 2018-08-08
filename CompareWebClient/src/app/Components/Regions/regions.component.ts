@@ -25,6 +25,7 @@ export class RegionsComponent implements OnInit, OnDestroy {
   regionSecond:string;
   regionQuestionID;
   loading:boolean = true;
+  noQuestion:boolean = false;
   subscription:Subscription;
   
   AnswerQuestion(answer){
@@ -45,23 +46,32 @@ export class RegionsComponent implements OnInit, OnDestroy {
     
   }
 
+  Refresh(){
+    this.alertService.clear();
+    this.GetNextQuestion();
+  }
+
   GetNextQuestion(){
     this.regionFirst = "Region";
     this.regionSecond = "Region";
     this.regionQuestionID = 0;
     this.loading = true;
+
     this.subscription.add(this.regionService.getNextQuestion().subscribe(
       (data) => {
         if(data){
+          this.noQuestion = false;
+
           this.regionFirst = data.regionOne;
           this.regionSecond = data.regionTwo;
           this.regionQuestionID = data.regionQuestionID;
         }
         else{
           this.alertService.error("There are no questions for this criteria right now.");
+          this.noQuestion = true;
+
         }
         this.loading = false;
-
       },
       (error) => {
         

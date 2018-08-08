@@ -1,7 +1,8 @@
 <div class="navigation">
-  <a href="#" (click)="NavigateBack()">Go Back</a>
+  <a href="javascript:void(0)" (click)="Refresh()">Refresh</a>
+  <a href="javascript:void(0)" (click)="NavigateBack()">Go Back</a>
 </div>
-<div >
+<div *ngIf="!noQuestion">
 
   <div class="page-header">
       <h2 class="questionHeading">Are these regions the same?</h2>
