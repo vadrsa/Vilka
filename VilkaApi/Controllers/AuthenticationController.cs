@@ -35,7 +35,7 @@ namespace WebApiJwt.Controllers
 
         public ActionResult<object> Connect()
         {
-            return "Successfully connected!";
+            return new ApplicationMessage { Message = "Success" };
         }
         
         [HttpPost]

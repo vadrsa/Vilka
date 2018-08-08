@@ -40,6 +40,7 @@ namespace VilkaApi.Controllers
         {
             User user = await GetCurrentUserAsync();
             answer.UserID = user.Id;
+            answer.AnsweredOn = DateTime.Now;
             new RegionQuestionManager().AnswerQuestion(answer);
             return true;
         }
