@@ -20,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using VilkaApi.BusinessLogic.Regions;
 using VilkaApi.ExceptionHandling;
 
 namespace VilkaApi
@@ -39,17 +40,17 @@ namespace VilkaApi
 
             DataConnection
                 .AddConfiguration(
-					"Default",
-					Configuration["ConnectionString"],
-					new SqlServerDataProvider("Default", SqlServerVersion.v2012));
+                    "Default",
+                    Configuration["ConnectionString"],
+                    new SqlServerDataProvider("Default", SqlServerVersion.v2012));
 
-			DataConnection.DefaultConfiguration = "Default";
+            DataConnection.DefaultConfiguration = "Default";
             services.AddIdentity<User, LinqToDB.Identity.IdentityRole>()
-				.AddLinqToDBStores(new DefaultConnectionFactory())
-				.AddDefaultTokenProviders();
+                .AddLinqToDBStores(new DefaultConnectionFactory())
+                .AddDefaultTokenProviders();
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             services
-                .AddAuthentication(options => 
+                .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -67,14 +68,14 @@ namespace VilkaApi
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 })
-				.AddCookie(options =>
-				{
-					options.Cookie.Name = "Interop";
-					options.DataProtectionProvider =
-						DataProtectionProvider.Create(new DirectoryInfo("C:\\Github\\Identity\\artifacts"));
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "Interop";
+                    options.DataProtectionProvider =
+                        DataProtectionProvider.Create(new DirectoryInfo("C:\\Github\\Identity\\artifacts"));
 
-				});
-
+                });
+            AddManagers(services);
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                 builder.AllowAnyOrigin()
@@ -85,6 +86,11 @@ namespace VilkaApi
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSingleton<IConfiguration>(Configuration);
+        }
+
+        private void AddManagers(IServiceCollection services)
+        {
+            services.AddSingleton<RegionQuestionManager, RegionQuestionManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -99,41 +105,9 @@ namespace VilkaApi
             else
             {
                 app.UseHsts();
-
             }
-            var connectionString = new SqlConnectionStringBuilder(Configuration["ConnectionString"])
-			{
-				InitialCatalog = "master"
-			}.ConnectionString;
 
-			using (var db = new DataConnection(SqlServerTools.GetDataProvider(), connectionString))
-			{
-				try
-				{
-					var sql = "create database [" +
-					          new SqlConnectionStringBuilder(Configuration["Data:DefaultConnection:ConnectionString"])
-						          .InitialCatalog + "]";
-					db.Execute(sql);
-				}
-				catch
-				{
-					//
-				}
-			}
-
-			// Try to create tables
-			using (var db = new DataConnection())
-			{
-				TryCreateTable<User>(db);
-				TryCreateTable<LinqToDB.Identity.IdentityRole>(db);
-				TryCreateTable<LinqToDB.Identity.IdentityUserClaim<string>>(db);
-				TryCreateTable<LinqToDB.Identity.IdentityRoleClaim<string>>(db);
-				TryCreateTable<LinqToDB.Identity.IdentityUserLogin<string>>(db);
-				TryCreateTable<LinqToDB.Identity.IdentityUserRole<string>>(db);
-				TryCreateTable<LinqToDB.Identity.IdentityUserToken<string>>(db);
-			}
-
-			app.UseStaticFiles();
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
@@ -142,18 +116,5 @@ namespace VilkaApi
 
             app.UseMvc();
         }
-
-        private void TryCreateTable<T>(DataConnection db)
-			where T : class
-		{
-			try
-			{
-				db.CreateTable<T>();
-			}
-			catch(Exception e)
-			{
-				//
-			}
-		}
     }
 }

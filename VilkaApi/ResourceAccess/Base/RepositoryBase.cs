@@ -61,6 +61,14 @@ namespace VilkaApi.ResourceAccess.Base
                 context.Update(obj);
             }
         }
+        
+        public void Delete(T obj)
+        {
+            using (DBContext context = new DBContext())
+            {
+                context.Delete(obj);
+            }
+        }
 
         public T SelectByKey(int key){
             using(DBContext context = new DBContext()){

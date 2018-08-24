@@ -15,7 +15,10 @@ namespace BusinessEntities
 
         [Column]
         public long TransactionNumber { get; set; }
-        
+
+        [Column]
+        public bool Finished { get; set; }
+
         public override bool Equals(object obj)
         {
             RegionPoolItem compTo = obj as RegionPoolItem;

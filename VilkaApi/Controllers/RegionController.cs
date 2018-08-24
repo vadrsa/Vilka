@@ -17,9 +17,12 @@ namespace VilkaApi.Controllers
     public class RegionController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+
+        private RegionQuestionManager questionManager;
         
-        public RegionController(UserManager<User> userManager)
+        public RegionController(UserManager<User> userManager, RegionQuestionManager reigonQuestionManager)
         {
+            questionManager = reigonQuestionManager;
             _userManager = userManager;
         }
 
@@ -30,7 +33,7 @@ namespace VilkaApi.Controllers
         public async Task<ActionResult<RegionQuestionInfo>> GetNextQuestion()
         {
             User user = await GetCurrentUserAsync();
-            return new RegionQuestionManager().GetNext(user.Id);
+            return questionManager.GetNext(user.Id);
         }
 
         [Route("answer")]
@@ -41,7 +44,7 @@ namespace VilkaApi.Controllers
             User user = await GetCurrentUserAsync();
             answer.UserID = user.Id;
             answer.AnsweredOn = DateTime.Now;
-            new RegionQuestionManager().AnswerQuestion(answer);
+            questionManager.AnswerQuestion(answer);
             return true;
         }
         

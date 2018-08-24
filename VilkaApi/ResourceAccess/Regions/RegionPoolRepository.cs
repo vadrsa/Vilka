@@ -13,9 +13,21 @@ namespace VilkaApi.ResourceAccess.Regions
     {
         protected override Expression<Func<DBContext, ITable<RegionPoolItem>>> TableExpression => c => c.RegionPool;
 
-        public List<int> GetPoolItemProcessingQueue(){
-            using(DBContext context = new DBContext()){
+        public List<int> GetPoolItemProcessingQueue()
+        {
+            using (DBContext context = new DBContext())
+            {
                 return context.QueryProc<int>("[SportCompare]..[regionGetQuestionPoolUniqueIDs]").ToList();
+            }
+        }
+
+        public void MarkFinished(int regionPoolItemID)
+        {
+            using (DBContext context = new DBContext())
+            {
+                RegionPoolItem item = SelectByKey(regionPoolItemID);
+                item.Finished = true;
+                context.Update(item);
             }
         }
     }

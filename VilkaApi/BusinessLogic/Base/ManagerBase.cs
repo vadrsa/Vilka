@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using BusinessEntities.Base;
@@ -13,7 +14,7 @@ namespace VilkaApi.BusinessLogic.Base
         public R Repository{
             get
             {
-                return typeof(R).GetProperty("Instance", BindingFlags.Static).GetValue(null) as R;
+                return typeof(R).GetProperty("Instance", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy).GetValue(null, null) as R;
             }
         }
 
@@ -32,6 +33,23 @@ namespace VilkaApi.BusinessLogic.Base
         public List<T> SelectAll()
         {
             return Repository.SelectAll();            
+        }
+
+        protected void ExecuteTransaction(Action action)
+        {
+            using(DBContext context = new DBContext())
+            {
+                context.BeginTransaction();
+                try
+                {
+                    action();
+                }
+                catch
+                {
+                    context.RollbackTransaction();
+                }
+                context.CommitTransaction();
+            }
         }
 
     }
